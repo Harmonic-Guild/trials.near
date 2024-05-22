@@ -17,7 +17,7 @@ const Container = styled.div`
 
 const SidebarContainer = styled.div`
   border-radius: 16px;
-  // border: 1px solid #000;
+  //border: 1px solid #000;
   background: #fff;
   width: 100%;
   min-height: 80vh;
@@ -26,7 +26,7 @@ const SidebarContainer = styled.div`
   flex-direction: column;
   align-items: flex-start;
   gap: 16px;
-  margin-bottom: 1rem;
+  //margin-bottom: 1rem;
 
   @media screen and (max-width: 768px) {
     border: 0px;
@@ -40,6 +40,10 @@ const ContentContainer = styled.div`
   border-radius: 16px;
   border: 1px solid var(--stroke-color, rgba(255, 255, 255, 0.2));
   grid-column: span 4 / span 4;
+  background: #fff;
+  min-height: 80vh;
+  //padding: 24px 12px;
+  //margin-bottom: 1rem;
 `;
 
 console.log("local app");

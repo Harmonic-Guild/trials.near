@@ -6,7 +6,7 @@ const { Post } = VM.require("${alias_builddao}/widget/components") || {
   Post: () => <></>,
 };
 
-const { MarkdownView } = VM.require("${alias_builddao}/widget/md-view") || {
+const { MarkdownView } = VM.require("${config_account}/widget/md-view") || {
   MarkdownView: () => <></>,
 };
 
