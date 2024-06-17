@@ -36,3 +36,29 @@ The way this guide works is that we try to explain all above mentioned steps. Ho
 
 
 ### Integrate Keypom Wallet Selector plugin in your dApp
+
+> We highly recommend you to read the official [documentation](https://docs.keypom.xyz/docs/next/TrialAccounts/Creation/integration#behind-the-scenes) on integrating Keypom selector in your app for enabling use of Trial Accounts. This [Types](https://docs.keypom.xyz/docs/next/keypom-sdk/Selector/welcome#trial-account-specs) documentation is also very helpful.
+
+For your dApp to support login via Trial Accounts you need to integrate keypom wallet selector plugin in your app.
+In your `app.js` or the similar file where you are initialising your wallet, add below Keypom plugin as well.
+
+```js
+setupKeypom({
+  networkId: this.network,
+  signInContractId: this.createAccessKeyFor,
+  trialAccountSpecs: {
+    url: "http://localhost:1234/trial-url#ACCOUNT_ID/SECRET_KEY",
+    modalOptions: KEYPOM_OPTIONS
+  },
+  instantSignInSpecs: {
+    url: "http://localhost:1234/instant-url#ACCOUNT_ID/SECRET_KEY/MODULE_ID",
+  }
+})
+```
+[See a full example here](https://github.com/keypom/keypom-docs-examples/blob/28444a492c513b8244e25ccaf067ca54f305b090/advanced-tutorials/trial-accounts/guest-book/near-wallet.js#L45-L55).
+
+The way Keypom plugin work is by parsing a trialAccountSpecs.url. For example, when your users visit a URL like `http://localhost:1234/trial-url#v2.keypom.testnet/3HbgYBvVMSfTBpXQ4fSecbPzwup2YkJPipNmT7e2iyw5MfzfMN3rHccsPddWcTGFTehCux7AbmtJiRqd78x4F57g`.
+
+ The Trial Account creator Modal will pop up. It looks like below.
+
+<img width="804" alt="trialAccount" src="https://github.com/Harmonic-Guild/trial-accounts/assets/12672862/98a63fd9-f214-4ca8-b3e8-c0ca0a915811">
