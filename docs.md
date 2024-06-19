@@ -8,18 +8,31 @@ This guide  further expands on how you can use trial accounts in your dApps succ
 ### What do you need?
 - A drop created in the Keypom contract with trial accounts configuration on Near.
 - A service (hosted where ever you like) to distribute keys for this drop. [Find better language here.]
-- A  dApp that has integrated the Keypom Wallet Selector to use trial accounts on this dApp.
+- A  dApp that has integrated the Keypom Wallet Selector to enable the use of trial accounts.
 
 
 ---
-The way this guide works is that we try to explain all above mentioned steps. How to achieve it manually using use scripts or near-cli and then explain how different components that we have build makes these steps easy and scalable.(Except the 3 part which is a regular integration.)
+The way this guide works is that we try to explain all above mentioned steps. How to achieve it manually using JS scripts or near-cli and then explain how different components that we have build makes these steps easy and scalable.(Except the 3 step which is a regular integration.)
 
 ### Creating a Trial Account Drop on the Keypom contract.
 
-1. To create a Trial Account drop, you need to take a certain number of complex steps. The Keypom SDK however provides you with a simple [createTrialAccountDrop](https://docs.keypom.xyz/docs/next/keypom-sdk/Core/modules#createtrialaccountdrop) function to do all these.
-2. We have built a simple [app](https://near.social/harmonic1.near/widget/app?page=create) using bos to achieve this. This reduces the barrier to setup a trial account drop using js scripts.
-3. Explain how to use the app below.
-4. This app returns you a unique drop_id that you would need in further steps.
+1. To create a Trial Account drop, you need to take a certain number of complex steps. Althoough the Keypom SDK provides you with a [createTrialAccountDrop](https://docs.keypom.xyz/docs/next/keypom-sdk/Core/modules#createtrialaccountdrop) function to do all this. You would need to execute te JS script on your system.
+2. To make it easier, we have built a simple [app](https://near.social/harmonic1.near/widget/app?page=create) using bos to achieve this. This reduces the barrier to setup a JS envrionment to create trial account drops.
+3. This app returns you a unique drop_id that you would need in further steps.
+
+#### How to use the Create app.
+
+1. Create App helps you create a trial account drop. This drop is essentially calling the Keypom Contract with trial account config. Trial Accounts are powered by a very small no-std smart contract. While creating a trial account drop you need to attach the wasm for this contract. The Create App simplifies this with a easy to use UI.
+2. Diffierent fields:
+- `Callable Contracts`: Input comma separated smart contract addresses that you want your Trial Account to have access to. You can input multiple addresses.
+		Example - `social.near, mintbase1.near`
+	- `Max Attachable Deposit`: Input comma separated values for Deposit in NEAR that your Trial Accounts can use while calling your allowed Contracts.
+	- `Callable Methods`: For every comma separated values you put for Callable Contracts, you will get an Input field for defining the methods your Trial Account can access. Write the methods you want in a comma separated manner.  You can also put '*' if you want to access all methods.
+	- `Starting Balance` : This is the amount of NEAR you want the Trial Account to have when the Trial starts.
+	- `Trial End Floor` :  Once the Trial Account has spent more than this amount (in $NEAR), the trial is over and the exit conditions must be met.
+	- `Repay Amount` : How much $NEAR should be paid back to the funder in order to unlock the trial account.
+	3. When you click on Create Drop, you will be asked to sign the transaction that calls the Keypom contract. This will also show you the unique `drop_id` of your drop. You can also access the drop_id from the explorer.
+	Keep the drop_id with you as would need it to distribute airdrops using it later.
 
 
 ### Setting up a simple airdrop service to distribute Trial Accounts
@@ -30,7 +43,7 @@ The way this guide works is that we try to explain all above mentioned steps. Ho
 4. To overcome this, we came with a system which adds a key to the drop in real time and return the private key to the user in the same request. This saves us from the "Drop already claimed" problem.
 5. Our airdrop service, hosts a private key and whenever the `/generate` endpoint is hit:
 	- It creates a keypair.
-	- Calls the `add_key` function in the Keypom contract with your `drop_id` and the public key just created.
+	- Calls the `add_key` function in the Keypom contract with your `drop_id`(the drop_id returned from the Create App) and the public key just created.
 	- Returns users the private key that they can use to claim the drop.
 6. Please refer to the Github [repository](https://github.com/Harmonic-Guild/airdrop-service) for the code of the Airdrop service and also for more documentation.
 

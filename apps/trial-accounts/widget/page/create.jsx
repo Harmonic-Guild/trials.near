@@ -1,71 +1,42 @@
-// Just fetch the CSS (ideally, only do it once per page instead of doing it in each component)
-const css = fetch("https://floatui.com/tailwind.css").body;
-if (!css) return "";
-const Tailwind = styled.div`
-  ${css}
-`;
-//const Tailwind = VM.require("harmonic1.near/widget/tailwind");
-
 const wasm = VM.require("jass-build.near/widget/trialAccountWasm");
 const contract = "v2.keypom.near";
 
-// Utility function to convert NEAR to YoctoNEAR (assuming it's not already provided)
-// const parseNearAmount = (nearAmount) => {
-//     return new BN(nearAmount).multipliedBy(new BN("1000000000000000000000000")).toString();
-// };
-
 const parseNearAmount = (nearAmount) => {
-  //
   // YoctoNEAR per NEAR (1 NEAR = 10^24 YoctoNEAR)
-  console.log(nearAmount);
+  //console.log(nearAmount);
   const nearToYocto = new Big("1000000000000000000000000");
-  console.log(nearAmount ? new Big(nearAmount).times(nearToYocto).toFixed() : "0");
+  //console.log(nearAmount ? new Big(nearAmount).times(nearToYocto).toFixed() : "0");
   return nearAmount ? new Big(nearAmount).times(nearToYocto).toFixed() : "0";
 };
 
-// State.init({
-//   callableContract: "",
-//   maxAttachableYoctoPerContract: "1",
-//   callableMethods: "*",
-//   startingBalance: "",
-//   trialEndFloor: "",
-// });
+const [callableContracts, setCallableContracts] = useState("");
+const [maxAttachableDepositNear, setMaxAttachableDepositNear] = useState("");
+const [dropId, setDropId] = useState(null);
 
-const [callableContract, setCallableContract] = useState("");
-const [callableContractValuesArray, setCallableContractValuesArray] = useState([]);
-
-const handleCallableContractInput = (e) => {
-  const { value } = e.target;
-  setCallableContract(value);
-  setCallableContractValuesArray(
-    value
-      .split(",")
-      .map((item) => item.trim())
-      .filter((item) => item)
-  );
+const handleCallableContractChange = (e) => {
+  setCallableContracts(e.target.value);
+  //creare callable method array on the basis of contracts length
+  const contracts = e.target.value.split(",").map((item) => item.trim());
+  setCallableMethodsArrays(contracts.map(() => ""));
 };
 
-// const handleCallableContractChange = (e) => {
-//   setCallableContract(e.target.value);
-// };
+const handleMaxAttachableDepositNearChange = (e) => {
+  setMaxAttachableDepositNear(e.target.value);
+};
 
 //const [maxAttachableYoctoPerContract, setMaxAttachableYoctoPerContract] = useState("1");
-const [callableMethods, setCallableMethods] = useState("");
-const [callableMethodsValuesArray, setCallableMethodsValuesArray] = useState([]);
+//const [callableMethods, setCallableMethods] = useState("");
+const [callableMethodsArrays, setCallableMethodsArrays] = useState([]);
 
-const handleCallableMethodsInput = (e) => {
-  const { value } = e.target;
-  setCallableMethods(value);
-  setCallableMethodsValuesArray(
-    value
-      .split(",")
-      .map((item) => item.trim())
-      .filter((item) => item)
-  );
+const handleCallableMethodsInput = (index, e) => {
+  const newCallableMethodsArrays = [...callableMethodsArrays];
+  newCallableMethodsArrays[index] = e.target.value;
+  setCallableMethodsArrays(newCallableMethodsArrays);
 };
 
 const [startingBalance, setStartingBalance] = useState("");
 const [trialEndFloor, setTrialEndFloor] = useState("");
+const [repayAmount, setRepayAmount] = useState("");
 
 const PARAM_START = "|kP|";
 const PARAM_STOP = "|kS|";
@@ -81,19 +52,6 @@ const wrapTxnParamsForTrial = (params) => {
   });
   return newParams;
 };
-
-// // What contracts can the trial account call?
-// const callableContracts = [
-//     'social.near'
-// ]
-// // What is the maximum amount of $NEAR that can be attached to a call for each callable contract?
-// const maxAttachableYoctoPerContract = [
-//     '1', //convert this into Yocto
-// ]
-// // What methods can the trial account call?
-// const callableMethods = [
-//     ['*'],
-// ]
 
 const DROP_CONFIG = {
   // How many claims can each key have.
@@ -128,33 +86,41 @@ const deployTrialAccount = () => {
   const startingBalanceYocto = parseNearAmount(startingBalance);
   const trialEndFloorYocto = parseNearAmount(trialEndFloor);
 
-  const maxAttachableYoctoPerContract = "1";
-  const callableMethods = "*";
+  const maxDepositArray = maxAttachableDepositNear.split(", ").map((deposit) => deposit.trim());
+  const maxAttachableYoctoPerContract = maxDepositArray.map((deposit) => {
+    if (deposit == "*") return "*";
+    return parseNearAmount(deposit);
+  });
 
-  //Before you pass callableContract and other two varss to create_drop
+  //Before you pass callableContract, callableMethods and to create_drop
   //You need to add the mapping contract there too.
-  // callableContracts.push('v1.mapping.keypom.near'); ////testnet: 'v1.mapping.keypom.testnet',
+  // Mapping contract - ('v1.mapping.keypom.near'); ////testnet: 'v1.mapping.keypom.testnet',
+  // function - "set"
+  // attachableDeposit - "0.002"
   const attachableForMapping = parseNearAmount("0.002"); // put the equivent yocto amount
 
   // Generate the proper args for setup:
-  let mappedVal = callableContractValuesArray.map((value) => value + ",v1.mapping.keypom.near");
-  let actualContracts = mappedVal.join(",");
-  let actualAmounts = maxAttachableYoctoPerContract + "," + attachableForMapping;
-  let actualMethods = callableMethods + "," + "set";
+  let actualContracts = callableContracts + ",v1.mapping.keypom.near";
 
-  //Disclaimer to extend above logic to support Arrays, please refer to original keypom functions.
+  let actualAmounts = maxAttachableYoctoPerContract.join(",") + "," + attachableForMapping;
+  console.log(actualAmounts);
+
+  let transformedMethods = callableMethodsArrays.map((methodArray) => {
+    return methodArray.split(", ").map((method) => method.trim());
+  });
+  //joining different methods from different contracts.
+  //And adding "set", for mapping contract
+  let actualMethods = transformedMethods.map((method) => method.join(":")).join(",") + ",set";
 
   //Take the storage cost into consideration for the attached deposit and trial end floor
-  const storageCost = parseNearAmount("0.35"); //Deposit for contract state, put in yocto
-  console.log("After storage");
-  // const attachedDeposit = new BN(startingBalanceYocto).add(new BN(storageCost)).toString();
-  // trialEndFloorYocto = new BN(attachedDeposit).sub(new BN(trialEndFloorYocto)).toString();
+  const storageCost = parseNearAmount("0.37"); //Deposit for contract state, put in yocto
+
   const attachedDeposit = new Big(startingBalanceYocto).plus(new Big(storageCost)).toFixed();
   trialEndFloorYocto = new Big(attachedDeposit).minus(new Big(trialEndFloorYocto)).toFixed();
 
-  console.log("Before storage");
-
-  const repayAmountYocto = "0";
+  //take this input
+  const repayAmountYocto = parseNearAmount(repayAmount);
+  //Repay to drop creator for now.
   const repayTo = context.accountId;
 
   const fcData = {
@@ -200,7 +166,10 @@ const deployTrialAccount = () => {
     ],
   };
 
+  //to-do Return drop-id to the user.
+  // In future create a page to show all current drops of a user and maybe its config as well.
   const drop_id = Date.now().toString();
+  setDropId(drop_id);
 
   const createDropArgs = {
     drop_id: drop_id,
@@ -212,11 +181,17 @@ const deployTrialAccount = () => {
     fc: fcData,
   };
 
-  Near.call(contract, "create_drop", createDropArgs, 100000000000000, 950000000000000000000000);
+  //TO-DO Deposit how much.
+  // Keypom gives a complicated way to  calculate the storage needed for creating a drop.
+  // We should implement in the future.
+  // For now 0.37 is the cost of storing the wasm and another 0.18 for drop config.
+  // Try increasing this if it fails.
+  const deposit = parseNearAmount(0.55);
+  Near.call(contract, "create_drop", createDropArgs, 100000000000000, deposit);
 };
 
 const ContentContainer = styled.div`
-background-color: #ebeaea;
+  background-color: #ebeaea;
 `;
 
 return (
@@ -237,22 +212,36 @@ return (
                   <label className="font-weight-medium">Callable Contract</label>
                   <input
                     type="text"
-                    placeholder="social.near"
-                    value={callableContract}
-                    onChange={handleCallableContractInput}
+                    placeholder="social.near, bob.near"
+                    value={callableContracts}
+                    onChange={handleCallableContractChange}
                     className="form-control mt-2"
                   />
                 </div>
                 <div className="form-group">
-                  <label className="font-weight-medium">Callable Methods</label>
+                  <label className="font-weight-medium">Max Attachable Deposit</label>
                   <input
                     type="text"
-                    value={callableMethods}
-                    onChange={handleCallableMethodsInput}
-                    placeholder="set,get (comma separated method names)"
+                    value={maxAttachableDepositNear}
+                    onChange={handleMaxAttachableDepositNearChange}
+                    placeholder="0.1, 0.2 (comma separated deposit values)"
                     className="form-control mt-2"
                   />
                 </div>
+                {callableMethodsArrays.map((methods, index) => (
+                  <div key={index} className="form-group">
+                    <label className="font-weight-medium">
+                      Callable Methods for Contract {index + 1}
+                    </label>
+                    <input
+                      type="text"
+                      value={methods}
+                      onChange={(e) => handleCallableMethodsInput(index, e)}
+                      placeholder="set,get (comma separated method names)"
+                      className="form-control mt-2"
+                    />
+                  </div>
+                ))}
                 <div className="form-group">
                   <label className="font-weight-medium">Starting Balance</label>
                   <input
@@ -271,6 +260,15 @@ return (
                     className="form-control mt-2"
                   />
                 </div>
+                <div className="form-group">
+                  <label className="font-weight-medium">Repay Amount</label>
+                  <input
+                    type="text"
+                    placeholder="0.01"
+                    onChange={(e) => setRepayAmount(e.target.value)}
+                    className="form-control mt-2"
+                  />
+                </div>
 
                 <button
                   onClick={async () => {
@@ -280,6 +278,7 @@ return (
                 >
                   Create Drop
                 </button>
+                {dropId && <p>Drop ID: {dropId}</p>}
               </div>
             ) : (
               <h2 className="text-dark display-4 font-weight-semibold">
