@@ -1,3 +1,4 @@
+
 ## Using Trial Accounts in your application
 
 
@@ -26,7 +27,7 @@ The way this guide works is that we try to explain all above mentioned steps. Ho
 
 1. Create App helps you create a trial account drop. This drop is essentially calling the Keypom Contract with trial account config. Trial Accounts are powered by a very small no-std smart contract. While creating a trial account drop you need to attach the wasm for this contract. The Create App simplifies this with an easy to use UI.
 2. Different fields:
-  - `Callable Contracts`: Input comma separated smart contract addresses that you want your Trial Account to have access to. You can input multiple addresses.
+    - `Callable Contracts`: Input comma separated smart contract addresses that you want your Trial Account to have access to. You can input multiple addresses.
 		Example - `social.near, mintbase1.near`
 	- `Max Attachable Deposit`: Input comma separated values for Deposit in NEAR that your Trial Accounts can use while calling your allowed Contracts.
 	- `Callable Methods`: For every comma separated values you put for Callable Contracts, you will get an Input field for defining the methods your Trial Account can access. Write the methods you want in a comma separated manner.  You can also put '*' if you want to access all methods.
@@ -34,7 +35,7 @@ The way this guide works is that we try to explain all above mentioned steps. Ho
 	- `Trial End Floor` :  Once the Trial Account has spent more than this amount (in $NEAR), the trial is over and the exit conditions must be met.
 	- `Repay Amount` : How much $NEAR should be paid back to the funder in order to unlock the trial account. This feature still needs a better flow. How should trial accounts buy NEAR to pay back the funder? We do not recommend using it at the moment.
 
-	3. When you click on Create Drop, you will be asked to sign the transaction that calls the Keypom contract. This will also show you the unique `drop_id` of your drop. You can also access the drop_id from the explorer.
+3. When you click on Create Drop, you will be asked to sign the transaction that calls the Keypom contract. This will also show you the unique `drop_id` of your drop. You can also access the drop_id from the explorer.
 	Keep the drop_id with you as would need it to distribute airdrops using it later.
 
 
