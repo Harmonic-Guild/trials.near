@@ -210,74 +210,154 @@ return (
               <div className="mt-3 pb-lg-5">
                 <div className="form-group">
                   <label className="font-weight-medium">Callable Contract</label>
-                  <input
-                    type="text"
-                    placeholder="social.near, bob.near"
-                    value={callableContracts}
-                    onChange={handleCallableContractChange}
-                    className="form-control mt-2"
-                  />
+                  <OverlayTrigger
+                    placement="right"
+                    overlay={
+                      <Tooltip id={`tooltip-right`}>
+                        Contracts that the Trial Accounts are allowed to access. Comma separated
+                        values if more than one contract.
+                      </Tooltip>
+                    }
+                  >
+                    <input
+                      type="text"
+                      placeholder="social.near, bob.near"
+                      value={callableContracts}
+                      onChange={handleCallableContractChange}
+                      className="form-control mt-2"
+                    />
+                  </OverlayTrigger>
                 </div>
                 <div className="form-group">
                   <label className="font-weight-medium">Max Attachable Deposit</label>
-                  <input
-                    type="text"
-                    value={maxAttachableDepositNear}
-                    onChange={handleMaxAttachableDepositNearChange}
-                    placeholder="0.1, 0.2 (comma separated deposit values)"
-                    className="form-control mt-2"
-                  />
+                  <OverlayTrigger
+                    placement="right"
+                    overlay={
+                      <Tooltip id={`tooltip-right`}>
+                        How much maximum deposit Trial Accounts are allowed to attach to function
+                        calls.
+                      </Tooltip>
+                    }
+                  >
+                    <input
+                      type="text"
+                      value={maxAttachableDepositNear}
+                      onChange={handleMaxAttachableDepositNearChange}
+                      placeholder="0.1, 0.2 (comma separated deposit values)"
+                      className="form-control mt-2"
+                    />
+                  </OverlayTrigger>
                 </div>
                 {callableMethodsArrays.map((methods, index) => (
                   <div key={index} className="form-group">
                     <label className="font-weight-medium">
                       Callable Methods for Contract {index + 1}
                     </label>
-                    <input
-                      type="text"
-                      value={methods}
-                      onChange={(e) => handleCallableMethodsInput(index, e)}
-                      placeholder="set,get (comma separated method names)"
-                      className="form-control mt-2"
-                    />
+                    <OverlayTrigger
+                      placement="right"
+                      overlay={
+                        <Tooltip id={`tooltip-right`}>
+                          Define functions for each callable contract that Trial Accounts are
+                          allowed to access.
+                        </Tooltip>
+                      }
+                    >
+                      <input
+                        type="text"
+                        value={methods}
+                        onChange={(e) => handleCallableMethodsInput(index, e)}
+                        placeholder="set,get (comma separated method names)"
+                        className="form-control mt-2"
+                      />
+                    </OverlayTrigger>
                   </div>
                 ))}
                 <div className="form-group">
                   <label className="font-weight-medium">Starting Balance</label>
-                  <input
-                    type="text"
-                    placeholder="0.1"
-                    onChange={(e) => setStartingBalance(e.target.value)}
-                    className="form-control mt-2"
-                  />
+                  <OverlayTrigger
+                    placement="right"
+                    overlay={
+                      <Tooltip id={`tooltip-right`}>
+                        Starting Balance that you want send to the Trial Accounts. It won't be like
+                        a regular airdrop cause they can't use anything other than your dApp.
+                      </Tooltip>
+                    }
+                  >
+                    <input
+                      type="text"
+                      placeholder="0.1"
+                      onChange={(e) => setStartingBalance(e.target.value)}
+                      className="form-control mt-2"
+                    />
+                  </OverlayTrigger>
                 </div>
                 <div className="form-group">
                   <label className="font-weight-medium">Trial End Floor</label>
-                  <input
-                    type="text"
-                    placeholder="0.01"
-                    onChange={(e) => setTrialEndFloor(e.target.value)}
-                    className="form-control mt-2"
-                  />
+                  <OverlayTrigger
+                    placement="right"
+                    overlay={
+                      <Tooltip id={`tooltip-right`}>
+                        After using this much NEAR, the Trial would be ended and the users will have
+                        to make a full/regular account.
+                      </Tooltip>
+                    }
+                  >
+                    <input
+                      type="text"
+                      placeholder="0.01"
+                      onChange={(e) => setTrialEndFloor(e.target.value)}
+                      className="form-control mt-2"
+                    />
+                  </OverlayTrigger>
                 </div>
                 <div className="form-group">
                   <label className="font-weight-medium">Repay Amount</label>
-                  <input
-                    type="text"
-                    placeholder="0.01"
-                    onChange={(e) => setRepayAmount(e.target.value)}
-                    className="form-control mt-2"
-                  />
+                  <OverlayTrigger
+                    placement="right"
+                    overlay={
+                      <Tooltip id={`tooltip-right`}>
+                        Repay amount that the trial accounts have to pay to the funder to get a
+                        regular account and also preserve the assets from their trial. Beta feature.
+                        Needs better flow.
+                      </Tooltip>
+                    }
+                  >
+                    <input
+                      type="text"
+                      placeholder="0.01"
+                      onChange={(e) => setRepayAmount(e.target.value)}
+                      className="form-control mt-2"
+                    />
+                  </OverlayTrigger>
                 </div>
 
-                <button
+                <OverlayTrigger
+                  // key={placement}
+                  placement="right"
+                  overlay={
+                    <Tooltip id={`tooltip-right`}>
+                      Calls the Keypom Contract and creats a Drop. Please save the Drop ID returned
+                      below.
+                    </Tooltip>
+                  }
+                >
+                  <button
+                    onClick={async () => {
+                      deployTrialAccount();
+                    }}
+                    className="btn btn-dark w-100 mt-3"
+                  >
+                    Create Drop
+                  </button>
+                </OverlayTrigger>
+                {/* <button
                   onClick={async () => {
                     deployTrialAccount();
                   }}
                   className="btn btn-dark w-100 mt-3"
                 >
                   Create Drop
-                </button>
+                </button> */}
                 {dropId && <p>Drop ID: {dropId}</p>}
               </div>
             ) : (

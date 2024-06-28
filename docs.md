@@ -32,7 +32,7 @@ The way this guide works is that we try to explain all above mentioned steps. Ho
 	- `Callable Methods`: For every comma separated values you put for Callable Contracts, you will get an Input field for defining the methods your Trial Account can access. Write the methods you want in a comma separated manner.  You can also put '*' if you want to access all methods.
 	- `Starting Balance` : This is the amount of NEAR you want the Trial Account to have when the Trial starts.
 	- `Trial End Floor` :  Once the Trial Account has spent more than this amount (in $NEAR), the trial is over and the exit conditions must be met.
-	- `Repay Amount` : How much $NEAR should be paid back to the funder in order to unlock the trial account.
+	- `Repay Amount` : How much $NEAR should be paid back to the funder in order to unlock the trial account. This feature still needs a better flow. How should trial accounts buy NEAR to pay back the funder? We do not recommend using it at the moment.
 
 	3. When you click on Create Drop, you will be asked to sign the transaction that calls the Keypom contract. This will also show you the unique `drop_id` of your drop. You can also access the drop_id from the explorer.
 	Keep the drop_id with you as would need it to distribute airdrops using it later.
