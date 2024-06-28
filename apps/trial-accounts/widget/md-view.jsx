@@ -24,8 +24,8 @@ const MarkdownContainer = styled.div`
     border-radius: 1rem;
   }
   code {
-    background: var(--bg-2, #23242b);
-    color: var(--text-color, #fff) !important;
+    //background: var(--bg-2, #23242b);
+    //color: var(--text-color, #fff) !important;
     font-family: monospace !important;
   }
   h1 {
@@ -62,6 +62,7 @@ const MarkdownContainer = styled.div`
 `;
 function MarkdownView(props) {
   const content = fetch(`${props.path}`);
+  console.log(content);
   if (content === null) return "";
   return (
     <MarkdownContainer>
